@@ -1,0 +1,26 @@
+{{/*
+=============================================================================
+Task Manager API - ServiceMonitor
+Prometheus scraping configuration for the application
+=============================================================================
+*/}}
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "task-manager-api.fullname" . }}
+  labels:
+    {{- include "task-manager-api.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "task-manager-api.selectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: http
+      path: {{ .Values.serviceMonitor.path | default "/metrics" }}
+      interval: {{ .Values.serviceMonitor.interval | default "30s" }}
+      scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout | default "10s" }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}

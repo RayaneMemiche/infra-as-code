@@ -1,0 +1,84 @@
+=============================================================================
+  🎉 Task Manager API has been deployed!
+=============================================================================
+
+Release: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+-----------------------------------------------------------------------------
+1. Get the application URL:
+-----------------------------------------------------------------------------
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ (index $host.paths 0).path }}
+{{- end }}
+{{- else if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "task-manager-api.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  Watch status: kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "task-manager-api.fullname" . }}
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "task-manager-api.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "task-manager-api.fullname" . }} 8080:{{ .Values.service.port }}
+  echo "Visit http://127.0.0.1:8080"
+{{- end }}
+
+-----------------------------------------------------------------------------
+2. Verify the deployment:
+-----------------------------------------------------------------------------
+  # Check pod status
+  kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "task-manager-api.name" . }}
+
+  # Check health endpoint (via port-forward)
+  curl http://127.0.0.1:8080/health
+
+  # Check readiness endpoint
+  curl http://127.0.0.1:8080/ready
+
+  # View logs
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "task-manager-api.name" . }} -f
+
+-----------------------------------------------------------------------------
+3. Check HPA status (if autoscaling enabled):
+-----------------------------------------------------------------------------
+{{- if .Values.autoscaling.enabled }}
+  kubectl get hpa -n {{ .Release.Namespace }} {{ include "task-manager-api.fullname" . }}
+{{- else }}
+  Autoscaling is disabled. Set autoscaling.enabled=true to enable.
+{{- end }}
+
+-----------------------------------------------------------------------------
+4. Important: Secret Configuration
+-----------------------------------------------------------------------------
+{{- if .Values.secrets.create }}
+  ⚠️  DEVELOPMENT MODE: Placeholder secrets have been created.
+  Replace with actual values before production use:
+
+  kubectl edit secret {{ include "task-manager-api.secretName" . }} -n {{ .Release.Namespace }}
+{{- else }}
+  ✅  Using existing secret: {{ .Values.secrets.existingSecret }}
+  Ensure this secret exists with keys: {{ join ", " .Values.secrets.keys }}
+
+  Create secret if missing:
+  kubectl create secret generic {{ .Values.secrets.existingSecret }} \
+    --namespace {{ .Release.Namespace }} \
+    --from-literal=DATABASE_URL='postgresql://...' \
+    --from-literal=API_TOKEN='your-secure-token'
+{{- end }}
+
+-----------------------------------------------------------------------------
+5. API Authentication
+-----------------------------------------------------------------------------
+  All /tasks endpoints require Bearer token authentication:
+
+  curl -H "Authorization: Bearer YOUR_API_TOKEN" \
+       -H "correlation_id: $(uuidgen)" \
+       http://127.0.0.1:8080/tasks
+
+=============================================================================
+  📖 Documentation: See C4 Section 5 for API specifications
+  🔧 Workload Identity: {{ include "task-manager-api.serviceAccountName" . }}
+=============================================================================

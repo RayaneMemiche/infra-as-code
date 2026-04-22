@@ -1,0 +1,178 @@
+# Default values for github-actions-runners
+# This is a YAML-formatted file.
+
+# Number of runner replicas
+replicaCount: 2
+
+image:
+  # myoung34/github-runner - auto-registers with GitHub, well-maintained
+  repository: myoung34/github-runner
+  tag: "latest"
+  pullPolicy: Always
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# GitHub configuration
+github:
+  # GitHub organization or repository URL
+  # For org-level runners: https://github.com/your-org
+  # For repo-level runners: https://github.com/your-org/your-repo
+  url: ""
+  # Option 1: Runner registration token (short-lived, 1 hour)
+  # Generate at: Settings > Actions > Runners > New self-hosted runner
+  runnerToken: ""
+  # Option 2: Personal Access Token (long-lived, recommended)
+  # Create at: Settings > Developer settings > Personal access tokens
+  # Needs 'repo' scope for repo-level, 'admin:org' for org-level
+  accessToken: ""
+  # Runner labels for job selection
+  labels:
+    - self-hosted
+    - linux
+    - x64
+    - gke
+  # Runner group (optional, for organization runners)
+  runnerGroup: "default"
+
+# Runner configuration
+runner:
+  # Runner name prefix (will be suffixed with pod name)
+  namePrefix: "gke-runner"
+  # Working directory for jobs
+  workDir: "/actions-runner/_work"
+  # Ephemeral runner (one job then terminate)
+  ephemeral: true
+  # Disable auto-updates (container image handles versioning)
+  disableAutoUpdate: true
+
+# Pod labels
+podLabels:
+  pool: runners
+  workload: ci-cd
+
+# Pod annotations
+podAnnotations: {}
+
+# Service account configuration
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# RBAC configuration
+rbac:
+  create: true
+  # Permissions needed for runners to manage pods (for container actions)
+  rules:
+    - apiGroups: [""]
+      resources: ["pods"]
+      verbs: ["get", "list", "watch", "create", "delete"]
+    - apiGroups: [""]
+      resources: ["pods/exec"]
+      verbs: ["get", "create"]
+    - apiGroups: [""]
+      resources: ["pods/log"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: [""]
+      resources: ["secrets"]
+      verbs: ["get", "list", "watch"]
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Autoscaling configuration
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+  # Scale down stabilization (prevent flapping)
+  scaleDownStabilizationWindowSeconds: 300
+
+# Node selector for runner pods
+nodeSelector:
+  cloud.google.com/gke-nodepool: runners
+
+# Tolerations for runner pods
+tolerations: []
+
+# Affinity rules
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - github-actions-runners
+          topologyKey: kubernetes.io/hostname
+
+# Security context for pods
+# Note: myoung34/github-runner manages its own user (runner), let it use defaults
+podSecurityContext: {}
+
+# Security context for containers
+# Note: myoung34/github-runner needs to manage its own permissions
+securityContext: {}
+
+# Liveness probe configuration
+livenessProbe:
+  exec:
+    command:
+      - /bin/sh
+      - -c
+      - "pgrep -f 'Runner.Listener' || exit 1"
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Readiness probe configuration
+readinessProbe:
+  exec:
+    command:
+      - /bin/sh
+      - -c
+      - "pgrep -f 'Runner.Listener' || exit 1"
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Additional environment variables
+extraEnv: []
+  # - name: RUNNER_DEBUG
+  #   value: "1"
+
+# Additional volume mounts
+extraVolumeMounts: []
+
+# Additional volumes
+extraVolumes: []
+
+# Docker-in-Docker support (for building container images)
+dind:
+  enabled: false
+  image:
+    repository: docker
+    tag: "24-dind"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi

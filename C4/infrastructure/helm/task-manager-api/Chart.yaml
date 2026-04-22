@@ -1,0 +1,36 @@
+# =============================================================================
+# Task Manager API Helm Chart
+# C4 Project - Kubernetes Deployment Configuration
+# =============================================================================
+
+apiVersion: v2
+name: task-manager-api
+description: A Helm chart for deploying the Task Manager API to GKE
+
+# Chart version - increment on chart changes
+version: 0.1.0
+
+# Application version - matches Docker image tag
+appVersion: "1.0.0"
+
+type: application
+
+keywords:
+  - task-manager
+  - api
+  - nodejs
+  - express
+  - postgresql
+
+home: https://github.com/Jouzep/infra-as-code
+
+maintainers:
+  - name: C4 Team
+    email: c4-team@example.com
+
+# Dependencies (none for now, could add postgresql subchart later)
+# dependencies:
+#   - name: postgresql
+#     version: "12.x.x"
+#     repository: "https://charts.bitnami.com/bitnami"
+#     condition: postgresql.enabled

@@ -1,0 +1,25 @@
+{{/*
+=============================================================================
+Task Manager API - Service
+C4 Project - ClusterIP Service for Internal Access
+=============================================================================
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "task-manager-api.fullname" . }}
+  labels:
+    {{- include "task-manager-api.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "task-manager-api.selectorLabels" . | nindent 4 }}

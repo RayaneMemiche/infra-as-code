@@ -1,0 +1,16 @@
+apiVersion: v2
+name: github-actions-runners
+description: Self-hosted GitHub Actions runners for CI/CD pipelines
+type: application
+version: 1.0.0
+appVersion: "2.311.0"
+keywords:
+  - github-actions
+  - runners
+  - ci-cd
+  - self-hosted
+maintainers:
+  - name: Zagreb Team
+home: https://github.com/actions/runner
+sources:
+  - https://github.com/actions/runner

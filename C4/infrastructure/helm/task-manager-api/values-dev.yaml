@@ -1,0 +1,70 @@
+# =============================================================================
+# Task Manager API - Development Environment Values
+# C4 Project - Dev-specific overrides
+# =============================================================================
+
+# Development uses fewer replicas
+replicaCount: 2
+
+image:
+  repository: europe-west1-docker.pkg.dev/fourth-outpost-479614-t4/c4-images/task-manager-api
+  pullPolicy: Always
+  tag: "dev"
+
+# Development resources - smaller footprint
+resources:
+  limits:
+    cpu: 250m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+# HPA for dev - smaller scale
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Dev-specific config
+config:
+  PORT: "3000"
+  NODE_ENV: "development"
+  LOG_LEVEL: "debug"
+  RATE_LIMIT_WINDOW_MS: "60000"
+  RATE_LIMIT_MAX: "200"  # Higher limit for testing
+
+# Secret configuration
+secrets:
+  create: false
+  existingSecret: "task-manager-api-secrets"
+  keys:
+    - DATABASE_URL
+    - API_TOKEN
+
+# -----------------------------------------------------------------------------
+# CLOUD SQL CONFIGURATION (Dev Environment)
+# -----------------------------------------------------------------------------
+# Uses GCP Secret Manager for secure credential storage
+# Secrets are created by Terraform and synced via External Secrets Operator
+cloudSQL:
+  enabled: true
+  projectId: "fourth-outpost-479614-t4"
+  secrets:
+    databaseUrl: "c4-postgres-dev-db-url"
+    databasePassword: "c4-postgres-dev-db-password"
+
+# Node selector for dev cluster
+nodeSelector:
+  cloud.google.com/gke-nodepool: application-pool
+
+# Ingress disabled in dev (use port-forward)
+ingress:
+  enabled: false
+
+# PDB for dev
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1

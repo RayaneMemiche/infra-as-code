@@ -1,0 +1,91 @@
+# =============================================================================
+# Task Manager API - Production Environment Values
+# C4 Project - Production-specific overrides
+# =============================================================================
+
+# Production uses more replicas
+replicaCount: 3
+
+image:
+  repository: europe-west1-docker.pkg.dev/fourth-outpost-479614-t4/c4-images/task-manager-api
+  pullPolicy: IfNotPresent
+  tag: "stable"
+
+# Production resources - higher limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# HPA for production - larger scale
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Production-specific config
+config:
+  PORT: "3000"
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  RATE_LIMIT_WINDOW_MS: "60000"
+  RATE_LIMIT_MAX: "100"  # Standard production limit
+
+# Secret configuration
+secrets:
+  create: false
+  existingSecret: "task-manager-api-secrets"
+  keys:
+    - DATABASE_URL
+    - API_TOKEN
+
+# Node selector for prd cluster
+nodeSelector:
+  cloud.google.com/gke-nodepool: application-pool
+
+# Ingress can be enabled for production when LB is ready
+ingress:
+  enabled: false
+  # When enabled, configure:
+  # className: "gce"
+  # annotations:
+  #   kubernetes.io/ingress.global-static-ip-name: "task-manager-ip"
+  # hosts:
+  #   - host: api.example.com
+  #     paths:
+  #       - path: /
+  #         pathType: Prefix
+  # tls:
+  #   - secretName: task-manager-tls
+  #     hosts:
+  #       - api.example.com
+
+# PDB for production - higher availability
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# More aggressive probes for production
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1

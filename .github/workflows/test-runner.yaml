@@ -1,0 +1,29 @@
+# Test workflow for self-hosted GKE runners
+name: Test Self-Hosted Runner
+
+on:
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  test-runner:
+    runs-on: [self-hosted, gke, dev]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Runner Info
+        run: |
+          echo "🎉 Running on self-hosted GKE runner!"
+          echo "Runner name: $RUNNER_NAME"
+          echo "Hostname: $(hostname)"
+          echo "OS: $(uname -a)"
+          echo "Working directory: $(pwd)"
+          echo "User: $(whoami)"
+
+      - name: Test kubectl access
+        run: |
+          echo "Testing if kubectl is available..."
+          which kubectl || echo "kubectl not installed (expected in runner image)"
+
+      - name: Success
+        run: echo "✅ Self-hosted runner test completed successfully!"

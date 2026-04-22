@@ -1,0 +1,276 @@
+<mxfile host="app.diagrams.net" modified="2025-01-24T10:00:00.000Z" agent="Claude" version="22.1.0">
+  <diagram name="C4 Architecture" id="c4-architecture">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ==================== TITLE ==================== -->
+        <mxCell id="title" value="C4 Infrastructure - Cloud-Native Architecture GCP" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#1a73e8;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== INTERNET ZONE ==================== -->
+        <mxCell id="internet-box" value="INTERNET" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="280" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="users" value="👤 Users" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="120" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="github" value="🐙 GitHub Actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="120" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== GCP CONTAINER ==================== -->
+        <mxCell id="gcp" value="Google Cloud Platform (europe-west1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=3;verticalAlign=top;fontStyle=1;fontSize=16;fontColor=#1a73e8;" vertex="1" parent="1">
+          <mxGeometry x="400" y="80" width="1100" height="880" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== WIF BOX ==================== -->
+        <mxCell id="wif-box" value="🔐 Workload Identity Federation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce8e6;strokeColor=#ea4335;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#c5221f;" vertex="1" parent="1">
+          <mxGeometry x="880" y="120" width="580" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="wif-pool" value="github-pool&#xa;(WIF Pool)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="910" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="wif-provider" value="github-provider&#xa;(OIDC Provider)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="170" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="wif-sa" value="terraform-github-actions&#xa;(Service Account)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1270" y="170" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== VPC BOX ==================== -->
+        <mxCell id="vpc" value="🌐 VPC: c4-vpc-dev (10.0.0.0/20)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4ea;strokeColor=#34a853;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=14;fontColor=#1e8e3e;" vertex="1" parent="1">
+          <mxGeometry x="420" y="280" width="760" height="660" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== LOAD BALANCER ==================== -->
+        <mxCell id="lb" value="⚖️ Load Balancer&#xa;(External IP)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285f4;strokeColor=#1a73e8;strokeWidth=2;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="320" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== GKE CLUSTER ==================== -->
+        <mxCell id="gke" value="☸️ GKE Cluster: c4-cluster-dev" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#1565c0;" vertex="1" parent="1">
+          <mxGeometry x="450" y="410" width="710" height="340" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== APP NODE POOL ==================== -->
+        <mxCell id="app-pool" value="📦 Application Node Pool&#xa;(e2-standard-2, 1-5 nodes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#43a047;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=12;fontColor=#2e7d32;" vertex="1" parent="1">
+          <mxGeometry x="470" y="460" width="400" height="270" as="geometry" />
+        </mxCell>
+
+        <!-- Task Manager Namespace -->
+        <mxCell id="ns-taskmanager" value="ns: task-manager" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#43a047;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=11;fontColor=#2e7d32;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="490" y="510" width="160" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="api" value="🚀 Task Manager API&#xa;(Express.js)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#43a047;strokeColor=#2e7d32;strokeWidth=2;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="505" y="550" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="hpa-app" value="📈 HPA&#xa;(1-10 replicas)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#43a047;strokeWidth=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="505" y="615" width="130" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ext-secret" value="🔑 ExternalSecret" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#43a047;strokeWidth=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="505" y="665" width="130" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Monitoring Namespace -->
+        <mxCell id="ns-monitoring" value="ns: monitoring" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=11;fontColor=#f57f17;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="510" width="180" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="prometheus" value="📊 Prometheus&#xa;(15d retention)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffb300;strokeColor=#ff8f00;strokeWidth=1;fontColor=#ffffff;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="685" y="550" width="100" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="grafana" value="📈 Grafana" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffb300;strokeColor=#ff8f00;strokeWidth=1;fontColor=#ffffff;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="685" y="610" width="100" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="alertmanager" value="🔔 Alertmanager" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffb300;strokeColor=#ff8f00;strokeWidth=1;fontColor=#ffffff;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="685" y="655" width="100" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="eso" value="🔐 ESO&#xa;(External Secrets Operator)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ce93d8;strokeColor=#7b1fa2;strokeWidth=1;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="800" y="560" width="60" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== RUNNERS NODE POOL ==================== -->
+        <mxCell id="runner-pool" value="🏃 Runners Node Pool&#xa;(e2-medium, 0-2 nodes, tainted)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=11;fontColor=#c62828;" vertex="1" parent="1">
+          <mxGeometry x="890" y="460" width="250" height="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ns-runners" value="ns: runners" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#e53935;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=11;fontColor=#c62828;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="910" y="510" width="210" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="runners" value="🤖 GitHub Self-Hosted Runners" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e53935;strokeColor=#c62828;strokeWidth=2;fontColor=#ffffff;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="930" y="540" width="170" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="hpa-runners" value="📈 HPA (1-5)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeColor=#e53935;strokeWidth=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="970" y="590" width="90" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== CLOUD SQL ==================== -->
+        <mxCell id="sql" value="🐘 Cloud SQL PostgreSQL&#xa;c4-postgres-dev&#xa;(Private IP, db-f1-micro)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#34a853;strokeColor=#1e8e3e;strokeWidth=2;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="800" width="200" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== CLOUD NAT ==================== -->
+        <mxCell id="nat" value="🌍 Cloud NAT&#xa;(Outbound Internet)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4285f4;strokeColor=#1a73e8;strokeWidth=2;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="800" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== SECRET MANAGER ==================== -->
+        <mxCell id="secrets" value="🔒 Secret Manager" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce8e6;strokeColor=#ea4335;strokeWidth=2;verticalAlign=top;fontStyle=1;fontColor=#c5221f;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="320" width="240" height="150" as="geometry" />
+        </mxCell>
+
+        <mxCell id="secret-db-pass" value="db-password" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="360" width="180" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="secret-db-url" value="database-url" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="400" width="180" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="secret-api-key" value="api-auth-token" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="440" width="180" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== ARTIFACT REGISTRY ==================== -->
+        <mxCell id="artifact-registry" value="📦 Artifact Registry&#xa;(Docker Images)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f0fe;strokeColor=#4285f4;strokeWidth=2;fontStyle=1;fontColor=#1a73e8;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="520" width="240" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ar-image" value="europe-west1-docker.pkg.dev/&#xa;.../task-manager-api:latest" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#4285f4;strokeWidth=1;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="555" width="200" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== CONNECTIONS WITH REAL LINKS ==================== -->
+
+        <!-- Users -> Load Balancer (HTTPS) -->
+        <mxCell id="conn-users-lb" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1a73e8;strokeWidth=2;fontStyle=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="users" target="lb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- GitHub -> WIF Pool (OIDC) -->
+        <mxCell id="conn-github-wif" value="OIDC Token" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ea4335;strokeWidth=2;dashed=1;fontStyle=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="github" target="wif-pool">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- WIF Pool -> Provider -->
+        <mxCell id="conn-pool-provider" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ea4335;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="wif-pool" target="wif-provider">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- WIF Provider -> SA -->
+        <mxCell id="conn-provider-sa" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ea4335;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="wif-provider" target="wif-sa">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- SA -> GKE (Deploy) -->
+        <mxCell id="conn-sa-gke" value="Deploy" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ea4335;strokeWidth=2;dashed=1;fontStyle=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="wif-sa" target="gke">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Load Balancer -> API (HTTP:80) -->
+        <mxCell id="conn-lb-api" value="HTTP:80" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#43a047;strokeWidth=2;fontStyle=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="lb" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- API -> Cloud SQL (TCP:5432) -->
+        <mxCell id="conn-api-sql" value="TCP:5432" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#34a853;strokeWidth=2;fontStyle=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="api" target="sql">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ESO -> Secrets (Fetch) -->
+        <mxCell id="conn-eso-secrets" value="Fetch Secrets" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7b1fa2;strokeWidth=2;dashed=1;fontStyle=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="eso" target="secrets">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ESO -> ExternalSecret (Sync) -->
+        <mxCell id="conn-eso-extsecret" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7b1fa2;strokeWidth=1;dashed=1;" edge="1" parent="1" source="eso" target="ext-secret">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Prometheus -> API (Scrape) -->
+        <mxCell id="conn-prom-api" value="Scrape" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ff8f00;strokeWidth=1;dashed=1;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="prometheus" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Prometheus -> Runners (Scrape) -->
+        <mxCell id="conn-prom-runners" value="Scrape" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ff8f00;strokeWidth=1;dashed=1;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="prometheus" target="runners">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Runners -> Artifact Registry (Pull) -->
+        <mxCell id="conn-runners-ar" value="Pull Image" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4285f4;strokeWidth=2;dashed=1;fontStyle=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="runners" target="artifact-registry">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- API -> NAT (Outbound) -->
+        <mxCell id="conn-api-nat" value="Outbound" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4285f4;strokeWidth=1;dashed=1;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="api" target="nat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- SA -> Artifact Registry (Push) -->
+        <mxCell id="conn-sa-ar" value="Push Image" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4285f4;strokeWidth=2;dashed=1;fontStyle=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="wif-sa" target="artifact-registry">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== LEGEND ==================== -->
+        <mxCell id="legend-box" value="Légende" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="650" width="240" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg1" value="── Trafic données" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#1a73e8;" vertex="1" parent="1">
+          <mxGeometry x="1235" y="680" width="120" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg2" value="╌╌ Auth / Config" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#ea4335;" vertex="1" parent="1">
+          <mxGeometry x="1235" y="700" width="120" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg3" value="🟢 Application" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1235" y="720" width="100" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg4" value="🟡 Monitoring" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1235" y="740" width="100" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg5" value="🔴 CI/CD Runners" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1235" y="760" width="100" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg6" value="🟣 Secrets Management" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1235" y="780" width="130" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg7" value="🔵 Networking" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1235" y="800" width="100" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== SPECS BOX ==================== -->
+        <mxCell id="specs-box" value="Spécifications" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1;verticalAlign=top;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="850" width="240" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="spec1" value="Region: europe-west1&#xa;VPC: 10.0.0.0/20&#xa;Pods: 10.1.0.0/16&#xa;Services: 10.2.0.0/20&#xa;Prometheus: 15 jours retention" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=10;spacing=5;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="880" width="220" height="80" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

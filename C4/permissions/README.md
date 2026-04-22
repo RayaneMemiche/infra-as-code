@@ -196,7 +196,7 @@ role = "roles/storage.objectViewer"  # GCS seulement
 ### Voir tous les accès du projet
 
 ```bash
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
   --format="table(bindings.role, bindings.members)"
 ```
@@ -204,7 +204,7 @@ gcloud projects get-iam-policy fourth-outpost-479614-t4 \
 ### Vérifier un utilisateur spécifique
 
 ```bash
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
   --filter="bindings.members:EMAIL@example.com" \
   --format="table(bindings.role)"
@@ -223,7 +223,7 @@ Si besoin de supprimer un accès immédiatement:
 
 ```bash
 # Supprimer un accès projet
-gcloud projects remove-iam-policy-binding fourth-outpost-479614-t4 \
+gcloud projects remove-iam-policy-binding iac-rattrapage-epitech \
   --member="user:EMAIL@example.com" \
   --role="roles/editor"
 
@@ -246,8 +246,8 @@ terraform refresh -var-file=environments/dev/terraform.tfvars
 ### Étudiants
 | Nom | Email | Rôle |
 |-----|-------|------|
-| lenny | lenny.vongphouthone@epitech.eu | roles/editor |
-| yorenn | yorennzzelina@hotmail.fr | roles/editor |
+| lenny | rayane.memiche@epitech.eu | roles/editor |
+| yorenn | rayane.memiche@epitech.eu | roles/editor |
 
 ### Billing Viewers
 - jeremie@jjaouen.com
@@ -268,7 +268,7 @@ L'email n'est pas un compte Google valide. L'utilisateur doit créer un compte G
 
 ```bash
 # Forcer via gcloud
-gcloud projects remove-iam-policy-binding fourth-outpost-479614-t4 \
+gcloud projects remove-iam-policy-binding iac-rattrapage-epitech \
   --member="user:EMAIL" \
   --role="ROLE"
 
@@ -297,7 +297,7 @@ L'email doit être un compte Google:
 Une fois ajouté via Terraform:
 1. Aller sur `https://console.cloud.google.com`
 2. Se connecter avec l'email configuré
-3. Sélectionner le projet `fourth-outpost-479614-t4`
+3. Sélectionner le projet `iac-rattrapage-epitech`
 
 ## Voir aussi
 

@@ -1,7 +1,7 @@
 # C4 Final Project - Development Environment Variables
 
 # Project Settings
-project_id  = "fourth-outpost-479614-t4"
+project_id  = "iac-rattrapage-epitech"
 region      = "europe-west1"
 zone        = "europe-west1-b"
 environment = "dev"
@@ -26,7 +26,7 @@ db_name          = "taskmanager"
 db_user          = "taskmanager"
 
 # Workload Identity Federation
-github_repo     = "Jouzep/infra-as-code"
+github_repo     = "RayaneMemiche/infra-as-code"
 wif_pool_id     = "github-pool"
 wif_provider_id = "github-provider"
 

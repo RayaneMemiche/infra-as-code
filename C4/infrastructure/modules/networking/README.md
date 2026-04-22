@@ -100,7 +100,7 @@ Ce module crée l'infrastructure réseau pour le projet C4: **VPC**, **Subnet**,
 #!/bin/bash
 # verify-networking.sh - Verify all networking resources created by Terraform
 
-PROJECT_ID="fourth-outpost-479614-t4"
+PROJECT_ID="iac-rattrapage-epitech"
 VPC_NAME="c4-vpc-dev"
 REGION="europe-west1"
 
@@ -177,10 +177,10 @@ echo "=========================================="
 ```bash
 # Vérifier le VPC
 gcloud compute networks describe c4-vpc-dev \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Lister tous les VPCs
-gcloud compute networks list --project=fourth-outpost-479614-t4
+gcloud compute networks list --project=iac-rattrapage-epitech
 ```
 
 #### Subnet
@@ -188,12 +188,12 @@ gcloud compute networks list --project=fourth-outpost-479614-t4
 # Vérifier le subnet avec les ranges secondaires
 gcloud compute networks subnets describe c4-vpc-dev-subnet \
   --region=europe-west1 \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Vérifier les secondary ranges
 gcloud compute networks subnets describe c4-vpc-dev-subnet \
   --region=europe-west1 \
-  --project=fourth-outpost-479614-t4 \
+  --project=iac-rattrapage-epitech \
   --format="yaml(secondaryIpRanges)"
 ```
 
@@ -202,13 +202,13 @@ gcloud compute networks subnets describe c4-vpc-dev-subnet \
 # Vérifier le routeur
 gcloud compute routers describe c4-vpc-dev-router \
   --region=europe-west1 \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Vérifier le NAT
 gcloud compute routers nats describe c4-vpc-dev-nat \
   --router=c4-vpc-dev-router \
   --region=europe-west1 \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 ```
 
 #### Firewall Rules
@@ -216,12 +216,12 @@ gcloud compute routers nats describe c4-vpc-dev-nat \
 # Lister toutes les règles firewall du VPC
 gcloud compute firewall-rules list \
   --filter="network:c4-vpc-dev" \
-  --project=fourth-outpost-479614-t4 \
+  --project=iac-rattrapage-epitech \
   --format="table(name,direction,priority,sourceRanges.list():label=SRC_RANGES,allowed[].map().firewall_rule().list():label=ALLOW)"
 
 # Détail d'une règle spécifique
 gcloud compute firewall-rules describe c4-vpc-dev-allow-internal \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 ```
 
 #### Private Service Connection
@@ -229,12 +229,12 @@ gcloud compute firewall-rules describe c4-vpc-dev-allow-internal \
 # Vérifier l'IP range réservée
 gcloud compute addresses describe c4-vpc-dev-private-ip-range \
   --global \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Vérifier le peering
 gcloud services vpc-peerings list \
   --network=c4-vpc-dev \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 ```
 
 ### Résumé des Ressources Attendues
@@ -242,11 +242,11 @@ gcloud services vpc-peerings list \
 ```bash
 # Commande rapide pour compter les ressources
 echo "=== Networking Resources Count ==="
-echo "VPC Networks: $(gcloud compute networks list --filter='name:c4-vpc-dev' --format='value(name)' --project=fourth-outpost-479614-t4 | wc -l)"
-echo "Subnets: $(gcloud compute networks subnets list --filter='name:c4-vpc-dev-subnet' --format='value(name)' --project=fourth-outpost-479614-t4 | wc -l)"
-echo "Routers: $(gcloud compute routers list --filter='name:c4-vpc-dev-router' --format='value(name)' --project=fourth-outpost-479614-t4 | wc -l)"
-echo "Firewall Rules: $(gcloud compute firewall-rules list --filter='network:c4-vpc-dev' --format='value(name)' --project=fourth-outpost-479614-t4 | wc -l)"
-echo "Global Addresses: $(gcloud compute addresses list --global --filter='name:c4-vpc-dev-private-ip-range' --format='value(name)' --project=fourth-outpost-479614-t4 | wc -l)"
+echo "VPC Networks: $(gcloud compute networks list --filter='name:c4-vpc-dev' --format='value(name)' --project=iac-rattrapage-epitech | wc -l)"
+echo "Subnets: $(gcloud compute networks subnets list --filter='name:c4-vpc-dev-subnet' --format='value(name)' --project=iac-rattrapage-epitech | wc -l)"
+echo "Routers: $(gcloud compute routers list --filter='name:c4-vpc-dev-router' --format='value(name)' --project=iac-rattrapage-epitech | wc -l)"
+echo "Firewall Rules: $(gcloud compute firewall-rules list --filter='network:c4-vpc-dev' --format='value(name)' --project=iac-rattrapage-epitech | wc -l)"
+echo "Global Addresses: $(gcloud compute addresses list --global --filter='name:c4-vpc-dev-private-ip-range' --format='value(name)' --project=iac-rattrapage-epitech | wc -l)"
 ```
 
 **Ressources attendues:**
@@ -287,11 +287,11 @@ echo "Global Addresses: $(gcloud compute addresses list --global --filter='name:
 # Check NAT status
 gcloud compute routers get-nat-mapping-info c4-vpc-dev-router \
   --region=europe-west1 \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Check NAT logs
 gcloud logging read 'resource.type="nat_gateway"' \
-  --project=fourth-outpost-479614-t4 \
+  --project=iac-rattrapage-epitech \
   --limit=10
 ```
 
@@ -302,7 +302,7 @@ gcloud compute ssh VM_NAME --tunnel-through-iap -- curl -v https://google.com
 
 # Check firewall rule hits
 gcloud compute firewall-rules describe c4-vpc-dev-allow-internal \
-  --project=fourth-outpost-479614-t4 \
+  --project=iac-rattrapage-epitech \
   --format="value(logConfig)"
 ```
 

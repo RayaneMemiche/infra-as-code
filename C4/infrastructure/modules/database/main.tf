@@ -173,18 +173,14 @@ resource "google_secret_manager_secret_version" "db_url" {
 
 # Allow the app service account to access the database URL secret
 resource "google_secret_manager_secret_iam_member" "db_url_access" {
-  count = var.app_service_account_email != "" ? 1 : 0
-
   project   = var.project_id
   secret_id = google_secret_manager_secret.db_url.secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${var.app_service_account_email}"
 }
 
-# Allow the app service account to access the password secret (optional)
+# Allow the app service account to access the password secret
 resource "google_secret_manager_secret_iam_member" "db_password_access" {
-  count = var.app_service_account_email != "" ? 1 : 0
-
   project   = var.project_id
   secret_id = google_secret_manager_secret.db_password.secret_id
   role      = "roles/secretmanager.secretAccessor"

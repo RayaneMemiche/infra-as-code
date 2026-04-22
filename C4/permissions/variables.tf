@@ -7,7 +7,7 @@
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
-  default     = "fourth-outpost-479614-t4"
+  default     = "iac-rattrapage-epitech"
 }
 
 variable "region" {
@@ -81,7 +81,7 @@ variable "billing_viewers" {
 variable "github_owner" {
   description = "GitHub repository owner (user or organization)"
   type        = string
-  default     = "Jouzep"
+  default     = "RayaneMemiche"
 }
 
 variable "github_repository" {

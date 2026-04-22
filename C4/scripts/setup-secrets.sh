@@ -11,7 +11,7 @@ NAMESPACE="${NAMESPACE:-task-manager}"
 SECRET_NAME="${SECRET_NAME:-task-manager-api-secrets}"
 CLUSTER_NAME="${CLUSTER_NAME:-c4-cluster-dev}"
 REGION="${REGION:-europe-west1}"
-PROJECT_ID="${PROJECT_ID:-fourth-outpost-479614-t4}"
+PROJECT_ID="${PROJECT_ID:-iac-rattrapage-epitech}"
 
 # Colors for output
 RED='\033[0;31m'

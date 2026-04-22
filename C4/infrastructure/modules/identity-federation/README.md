@@ -62,8 +62,8 @@ Quand un workflow GitHub Actions démarre, GitHub génère automatiquement un to
 ```json
 {
   "iss": "https://token.actions.githubusercontent.com",
-  "sub": "repo:yorennz/infra-as-code:ref:refs/heads/main",
-  "repository": "yorennz/infra-as-code",
+  "sub": "repo:RayaneMemiche/infra-as-code:ref:refs/heads/main",
+  "repository": "RayaneMemiche/infra-as-code",
   "actor": "username",
   "ref": "refs/heads/main",
   "ref_type": "branch"
@@ -112,7 +112,7 @@ resource "google_iam_workload_identity_pool_provider" "github" {
     "attribute.ref_type"   = "assertion.ref_type"
   }
 
-  attribute_condition = "assertion.repository == 'yorennz/infra-as-code'"
+  attribute_condition = "assertion.repository == 'RayaneMemiche/infra-as-code'"
 
   oidc {
     issuer_uri = "https://token.actions.githubusercontent.com"
@@ -130,7 +130,7 @@ resource "google_iam_workload_identity_pool_provider" "github" {
 | `attribute.ref` | `assertion.ref` | Branche/tag (refs/heads/main) |
 | `attribute.ref_type` | `assertion.ref_type` | Type (branch, tag) |
 
-**Sécurité:** La condition `assertion.repository == 'yorennz/infra-as-code'` garantit que seul ce repo peut s'authentifier.
+**Sécurité:** La condition `assertion.repository == 'RayaneMemiche/infra-as-code'` garantit que seul ce repo peut s'authentifier.
 
 ### 3. Service Account Terraform
 
@@ -185,11 +185,11 @@ locals {
 resource "google_service_account_iam_member" "workload_identity_binding" {
   service_account_id = google_service_account.terraform.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${pool_name}/attribute.repository/yorennz/infra-as-code"
+  member             = "principalSet://iam.googleapis.com/${pool_name}/attribute.repository/RayaneMemiche/infra-as-code"
 }
 ```
 
-**Rôle:** Autorise les workflows du repo `yorennz/infra-as-code` à impersonate le Service Account.
+**Rôle:** Autorise les workflows du repo `RayaneMemiche/infra-as-code` à impersonate le Service Account.
 
 ## Usage dans GitHub Actions
 
@@ -216,8 +216,8 @@ jobs:
       # Authenticate to GCP via WIF
       - uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/fourth-outpost-479614-t4/locations/global/workloadIdentityPools/github-pool/providers/github-provider
-          service_account: terraform-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+          workload_identity_provider: projects/iac-rattrapage-epitech/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: terraform-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 
       # Now you can use gcloud/terraform
       - uses: hashicorp/setup-terraform@v3
@@ -241,7 +241,7 @@ jobs:
 │  2. GitHub generates OIDC token (signed JWT)                     │
 │     {                                                             │
 │       "iss": "https://token.actions.githubusercontent.com",       │
-│       "repository": "yorennz/infra-as-code",                     │
+│       "repository": "RayaneMemiche/infra-as-code",                     │
 │       "ref": "refs/heads/main"                                   │
 │     }                                                             │
 └───────────────────────────┬──────────────────────────────────────┘
@@ -254,12 +254,12 @@ jobs:
 │                                                                   │
 │  4. Validate token:                                               │
 │     ✓ Issuer = token.actions.githubusercontent.com               │
-│     ✓ Repository = yorennz/infra-as-code                         │
+│     ✓ Repository = RayaneMemiche/infra-as-code                         │
 │     ✓ Token signature valid                                       │
 │                                                                   │
 │  5. Map attributes:                                               │
 │     google.subject = assertion.sub                                │
-│     attribute.repository = yorennz/infra-as-code                 │
+│     attribute.repository = RayaneMemiche/infra-as-code                 │
 └───────────────────────────┬──────────────────────────────────────┘
                             │
                             │ 6. Token validated
@@ -268,7 +268,7 @@ jobs:
 │                 Service Account: terraform-dev                    │
 │                                                                   │
 │  7. Check IAM binding:                                            │
-│     ✓ principalSet://...attribute.repository/yorennz/infra-as-code│
+│     ✓ principalSet://...attribute.repository/RayaneMemiche/infra-as-code│
 │       has roles/iam.workloadIdentityUser                         │
 │                                                                   │
 │  8. Generate temporary credentials (1 hour)                       │
@@ -316,7 +316,7 @@ jobs:
 #!/bin/bash
 # verify-identity-federation.sh - Verify all WIF resources created by Terraform
 
-PROJECT_ID="fourth-outpost-479614-t4"
+PROJECT_ID="iac-rattrapage-epitech"
 POOL_ID="github-pool"
 PROVIDER_ID="github-provider"
 SA_EMAIL="terraform-dev@${PROJECT_ID}.iam.gserviceaccount.com"
@@ -400,12 +400,12 @@ echo "=========================================="
 # Lister tous les pools
 gcloud iam workload-identity-pools list \
   --location=global \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Détails du pool
 gcloud iam workload-identity-pools describe github-pool \
   --location=global \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 ```
 
 #### Workload Identity Provider
@@ -414,13 +414,13 @@ gcloud iam workload-identity-pools describe github-pool \
 gcloud iam workload-identity-pools providers list \
   --workload-identity-pool=github-pool \
   --location=global \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Détails du provider avec configuration OIDC
 gcloud iam workload-identity-pools providers describe github-provider \
   --workload-identity-pool=github-pool \
   --location=global \
-  --project=fourth-outpost-479614-t4 \
+  --project=iac-rattrapage-epitech \
   --format="yaml(oidc,attributeCondition,attributeMapping)"
 ```
 
@@ -428,19 +428,19 @@ gcloud iam workload-identity-pools providers describe github-provider \
 ```bash
 # Détails du Service Account
 gcloud iam service-accounts describe \
-  terraform-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+  terraform-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 
 # Lister les clés (devrait être vide avec WIF)
 gcloud iam service-accounts keys list \
-  --iam-account=terraform-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+  --iam-account=terraform-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 ```
 
 #### IAM Roles
 ```bash
 # Voir les rôles du Service Account sur le projet
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
-  --filter="bindings.members:terraform-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com" \
+  --filter="bindings.members:terraform-dev@iac-rattrapage-epitech.iam.gserviceaccount.com" \
   --format="table(bindings.role)"
 ```
 
@@ -448,7 +448,7 @@ gcloud projects get-iam-policy fourth-outpost-479614-t4 \
 ```bash
 # Voir les bindings WIF sur le Service Account
 gcloud iam service-accounts get-iam-policy \
-  terraform-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com \
+  terraform-dev@iac-rattrapage-epitech.iam.gserviceaccount.com \
   --format="yaml"
 ```
 
@@ -457,10 +457,10 @@ gcloud iam service-accounts get-iam-policy \
 ```bash
 # Commande rapide pour compter les ressources
 echo "=== Identity Federation Resources Count ==="
-echo "WIF Pools: $(gcloud iam workload-identity-pools list --location=global --format='value(name)' --project=fourth-outpost-479614-t4 | grep -c github-pool)"
-echo "WIF Providers: $(gcloud iam workload-identity-pools providers list --workload-identity-pool=github-pool --location=global --format='value(name)' --project=fourth-outpost-479614-t4 2>/dev/null | wc -l)"
-echo "Service Accounts: $(gcloud iam service-accounts list --filter='email:terraform-dev' --format='value(email)' --project=fourth-outpost-479614-t4 | wc -l)"
-echo "SA Roles: $(gcloud projects get-iam-policy fourth-outpost-479614-t4 --flatten='bindings[].members' --filter='bindings.members:terraform-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com' --format='value(bindings.role)' | wc -l)"
+echo "WIF Pools: $(gcloud iam workload-identity-pools list --location=global --format='value(name)' --project=iac-rattrapage-epitech | grep -c github-pool)"
+echo "WIF Providers: $(gcloud iam workload-identity-pools providers list --workload-identity-pool=github-pool --location=global --format='value(name)' --project=iac-rattrapage-epitech 2>/dev/null | wc -l)"
+echo "Service Accounts: $(gcloud iam service-accounts list --filter='email:terraform-dev' --format='value(email)' --project=iac-rattrapage-epitech | wc -l)"
+echo "SA Roles: $(gcloud projects get-iam-policy iac-rattrapage-epitech --flatten='bindings[].members' --filter='bindings.members:terraform-dev@iac-rattrapage-epitech.iam.gserviceaccount.com' --format='value(bindings.role)' | wc -l)"
 ```
 
 **Ressources attendues:**
@@ -477,7 +477,7 @@ echo "SA Roles: $(gcloud projects get-iam-policy fourth-outpost-479614-t4 --flat
 
 ### Bonnes Pratiques Implémentées
 
-1. **Repo-scoped access**: Seul `yorennz/infra-as-code` peut s'authentifier
+1. **Repo-scoped access**: Seul `RayaneMemiche/infra-as-code` peut s'authentifier
 2. **Temporary credentials**: Les tokens expirent après 1 heure
 3. **No secrets in GitHub**: Pas de JSON key dans les secrets
 4. **Audit trail**: Toutes les authentifications sont loggées dans GCP

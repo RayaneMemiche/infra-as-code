@@ -25,7 +25,7 @@ terraform {
 
   # Remote state in GCS - use existing bucket from C2
   backend "gcs" {
-    bucket = "tfstate-fourth-outpost-479614-t4"
+    bucket = "tfstate-iac-rattrapage-epitech"
     prefix = "c4/terraform/state"
   }
 }

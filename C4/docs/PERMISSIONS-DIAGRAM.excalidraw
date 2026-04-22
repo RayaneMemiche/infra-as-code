@@ -1186,11 +1186,11 @@
       "locked": false,
       "fontSize": 14,
       "fontFamily": 3,
-      "text": "PROJECT IAM: fourth-outpost-479614-t4\n  user:jeremie@jjaouen.com -> roles/viewer\n  user:lenny.vongphouthone@epitech.eu -> roles/editor\n  user:yorennzzelina@hotmail.fr -> roles/editor",
+      "text": "PROJECT IAM: iac-rattrapage-epitech\n  user:jeremie@jjaouen.com -> roles/viewer\n  user:rayane.memiche@epitech.eu -> roles/editor\n  user:rayane.memiche@epitech.eu -> roles/editor",
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "PROJECT IAM: fourth-outpost-479614-t4\n  user:jeremie@jjaouen.com -> roles/viewer\n  user:lenny.vongphouthone@epitech.eu -> roles/editor\n  user:yorennzzelina@hotmail.fr -> roles/editor",
+      "originalText": "PROJECT IAM: iac-rattrapage-epitech\n  user:jeremie@jjaouen.com -> roles/viewer\n  user:rayane.memiche@epitech.eu -> roles/editor\n  user:rayane.memiche@epitech.eu -> roles/editor",
       "lineHeight": 1.25,
       "baseline": 50
     },

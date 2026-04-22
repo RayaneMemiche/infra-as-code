@@ -182,7 +182,7 @@ module "gke" {
   source = "./modules/gke"
 
   # Required
-  project_id          = "fourth-outpost-479614-t4"
+  project_id          = "iac-rattrapage-epitech"
   region              = "europe-west1"
   zone                = "europe-west1-b"
   cluster_name        = "c4-cluster-dev"
@@ -211,7 +211,7 @@ module "gke" {
 # Obtenir les credentials
 gcloud container clusters get-credentials c4-cluster-dev \
   --zone europe-west1-b \
-  --project fourth-outpost-479614-t4
+  --project iac-rattrapage-epitech
 
 # Vérifier la connexion
 kubectl get nodes
@@ -244,7 +244,7 @@ curl -sS https://webinstall.dev/k9s | bash
 # 1. Se connecter au cluster GKE (si pas déjà fait)
 gcloud container clusters get-credentials c4-cluster-dev \
   --zone europe-west1-b \
-  --project fourth-outpost-479614-t4
+  --project iac-rattrapage-epitech
 
 # 2. Lancer k9s
 k9s
@@ -326,8 +326,8 @@ k9s:
     tail: 100
     buffer: 5000
     sinceSeconds: 60
-  currentContext: gke_fourth-outpost-479614-t4_europe-west1-b_c4-cluster-dev
-  currentCluster: gke_fourth-outpost-479614-t4_europe-west1-b_c4-cluster-dev
+  currentContext: gke_iac-rattrapage-epitech_europe-west1-b_c4-cluster-dev
+  currentCluster: gke_iac-rattrapage-epitech_europe-west1-b_c4-cluster-dev
 ```
 
 ### Configuration Workload Identity
@@ -342,7 +342,7 @@ metadata:
   name: taskmanager
   namespace: default
   annotations:
-    iam.gke.io/gcp-service-account: taskmanager-app-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: taskmanager-app-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 
 ---
 # 2. Utiliser ce ServiceAccount dans le Deployment
@@ -451,7 +451,7 @@ spec:
 #!/bin/bash
 # verify-gke.sh - Verify all GKE resources created by Terraform
 
-PROJECT_ID="fourth-outpost-479614-t4"
+PROJECT_ID="iac-rattrapage-epitech"
 CLUSTER_NAME="c4-cluster-dev"
 ZONE="europe-west1-b"
 APP_SA="taskmanager-app-dev@${PROJECT_ID}.iam.gserviceaccount.com"
@@ -576,23 +576,23 @@ echo "=========================================="
 ```bash
 # Lister les clusters
 gcloud container clusters list \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Détails du cluster
 gcloud container clusters describe c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Configuration Workload Identity
 gcloud container clusters describe c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4 \
+  --project=iac-rattrapage-epitech \
   --format="yaml(workloadIdentityConfig)"
 
 # Configuration Private Cluster
 gcloud container clusters describe c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4 \
+  --project=iac-rattrapage-epitech \
   --format="yaml(privateClusterConfig)"
 ```
 
@@ -602,19 +602,19 @@ gcloud container clusters describe c4-cluster-dev \
 gcloud container node-pools list \
   --cluster=c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Détails d'un node pool spécifique
 gcloud container node-pools describe c4-cluster-dev-application \
   --cluster=c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Vérifier les taints sur runners pool
 gcloud container node-pools describe c4-cluster-dev-runners \
   --cluster=c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4 \
+  --project=iac-rattrapage-epitech \
   --format="yaml(config.taints)"
 ```
 
@@ -623,29 +623,29 @@ gcloud container node-pools describe c4-cluster-dev-runners \
 # Lister les SAs pour l'application
 gcloud iam service-accounts list \
   --filter="email:taskmanager" \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Détails du SA application
 gcloud iam service-accounts describe \
-  taskmanager-app-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+  taskmanager-app-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 
 # Détails du SA runners
 gcloud iam service-accounts describe \
-  taskmanager-runners-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+  taskmanager-runners-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 ```
 
 #### IAM Roles
 ```bash
 # Rôles du SA application
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
-  --filter="bindings.members:taskmanager-app-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com" \
+  --filter="bindings.members:taskmanager-app-dev@iac-rattrapage-epitech.iam.gserviceaccount.com" \
   --format="table(bindings.role)"
 
 # Rôles du SA runners
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
-  --filter="bindings.members:taskmanager-runners-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com" \
+  --filter="bindings.members:taskmanager-runners-dev@iac-rattrapage-epitech.iam.gserviceaccount.com" \
   --format="table(bindings.role)"
 ```
 
@@ -653,11 +653,11 @@ gcloud projects get-iam-policy fourth-outpost-479614-t4 \
 ```bash
 # Vérifier WIF binding sur SA application
 gcloud iam service-accounts get-iam-policy \
-  taskmanager-app-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+  taskmanager-app-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 
 # Vérifier WIF binding sur SA runners
 gcloud iam service-accounts get-iam-policy \
-  taskmanager-runners-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+  taskmanager-runners-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 ```
 
 #### Kubectl (après déploiement)
@@ -665,7 +665,7 @@ gcloud iam service-accounts get-iam-policy \
 # Obtenir les credentials
 gcloud container clusters get-credentials c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Vérifier les nodes
 kubectl get nodes -o wide
@@ -683,7 +683,7 @@ kubectl get namespaces
 
 ```bash
 # Commande rapide pour compter les ressources
-PROJECT_ID="fourth-outpost-479614-t4"
+PROJECT_ID="iac-rattrapage-epitech"
 CLUSTER="c4-cluster-dev"
 ZONE="europe-west1-b"
 

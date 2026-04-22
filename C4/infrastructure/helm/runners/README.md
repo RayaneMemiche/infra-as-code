@@ -220,7 +220,7 @@ gh auth login
 # Connexion au cluster
 gcloud container clusters get-credentials c4-cluster-dev \
   --zone europe-west1-b \
-  --project fourth-outpost-479614-t4
+  --project iac-rattrapage-epitech
 
 # Déploiement
 helm install runners ./C4/infrastructure/helm/runners \

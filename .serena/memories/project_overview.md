@@ -33,7 +33,7 @@ Infrastructure as Code for the C4 final project on Google Cloud Platform (GCP): 
 - Next: Database (Cloud SQL), Load Balancer (HTTPS Ingress)
 
 ## Backends & Auth
-- Terraform remote state: GCS bucket tfstate-fourth-outpost-479614-t4 (prefix c4/terraform/state)
+- Terraform remote state: GCS bucket tfstate-iac-rattrapage-epitech (prefix c4/terraform/state)
 - Auth:
   - Local: gcloud auth application-default login
   - CI/CD: Workload Identity Federation (OIDC) from GitHub Actions

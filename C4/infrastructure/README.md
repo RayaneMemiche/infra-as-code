@@ -71,7 +71,7 @@ C4/infrastructure/
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     GCP Project                              │
-│              fourth-outpost-479614-t4                        │
+│              iac-rattrapage-epitech                        │
 │                                                              │
 │  ┌─────────────────────────────────────────────────────┐    │
 │  │                 VPC: c4-vpc-dev                      │    │
@@ -106,7 +106,7 @@ C4/infrastructure/
 │                           │                                  │
 │                           ▼                                  │
 │                    GitHub Actions                            │
-│                 (yorennz/infra-as-code)                      │
+│                 (RayaneMemiche/infra-as-code)                      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -141,13 +141,13 @@ terraform apply -var-file=environments/dev/terraform.tfvars
 
 ```bash
 # VPC Network
-gcloud compute networks list --project=fourth-outpost-479614-t4
+gcloud compute networks list --project=iac-rattrapage-epitech
 
 # Subnets
-gcloud compute networks subnets list --project=fourth-outpost-479614-t4
+gcloud compute networks subnets list --project=iac-rattrapage-epitech
 
 # Firewall Rules
-gcloud compute firewall-rules list --project=fourth-outpost-479614-t4
+gcloud compute firewall-rules list --project=iac-rattrapage-epitech
 
 # Cloud NAT
 gcloud compute routers nats list --router=c4-vpc-dev-router --region=europe-west1
@@ -156,14 +156,14 @@ gcloud compute routers nats list --router=c4-vpc-dev-router --region=europe-west
 gcloud iam workload-identity-pools list --location=global
 
 # Service Account
-gcloud iam service-accounts list --project=fourth-outpost-479614-t4
+gcloud iam service-accounts list --project=iac-rattrapage-epitech
 ```
 
 ## Variables
 
 | Variable | Description | Dev Value |
 |----------|-------------|-----------|
-| `project_id` | GCP Project ID | `fourth-outpost-479614-t4` |
+| `project_id` | GCP Project ID | `iac-rattrapage-epitech` |
 | `region` | GCP Region | `europe-west1` |
 | `zone` | GCP Zone | `europe-west1-b` |
 | `environment` | Environment | `dev` |
@@ -171,7 +171,7 @@ gcloud iam service-accounts list --project=fourth-outpost-479614-t4
 | `subnet_cidr` | Subnet CIDR | `10.0.0.0/20` |
 | `pods_cidr` | Pods CIDR | `10.1.0.0/16` |
 | `services_cidr` | Services CIDR | `10.2.0.0/20` |
-| `github_repo` | GitHub repo for WIF | `yorennz/infra-as-code` |
+| `github_repo` | GitHub repo for WIF | `RayaneMemiche/infra-as-code` |
 
 ## Outputs
 
@@ -196,7 +196,7 @@ gcloud iam service-accounts list --project=fourth-outpost-479614-t4
 ```bash
 gcloud auth login
 gcloud auth application-default login
-gcloud config set project fourth-outpost-479614-t4
+gcloud config set project iac-rattrapage-epitech
 ```
 
 ### State lock error
@@ -267,7 +267,7 @@ Le stack de monitoring comprend Prometheus, Grafana, Alertmanager et les exporte
 # 1. Se connecter au cluster GKE
 gcloud container clusters get-credentials c4-cluster-dev \
   --zone europe-west1-b \
-  --project fourth-outpost-479614-t4
+  --project iac-rattrapage-epitech
 
 # 2. Verifier la connexion
 kubectl cluster-info

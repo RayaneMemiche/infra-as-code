@@ -1,0 +1,52 @@
+# Production environment values for github-actions-runners
+
+# Higher replica count for production reliability
+replicaCount: 2
+
+# GitHub configuration - override with actual values
+github:
+  url: ""  # Set via --set or secret
+  runnerToken: ""  # Set via --set or secret
+  labels:
+    - self-hosted
+    - linux
+    - x64
+    - gke
+    - prd
+
+# Runner configuration
+runner:
+  namePrefix: "gke-runner-prd"
+  ephemeral: true
+
+# Pod labels for prd environment
+podLabels:
+  pool: runners
+  workload: ci-cd
+  environment: prd
+
+# Full resources for production
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Production autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+  scaleDownStabilizationWindowSeconds: 300  # Conservative scale down
+
+# Pod disruption budget for production
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# No debug logging in production
+extraEnv: []

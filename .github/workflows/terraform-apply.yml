@@ -1,0 +1,227 @@
+# =============================================================================
+# Terraform Apply Workflow
+# Applies infrastructure changes including application deployment
+# Triggered on version tags or after successful build
+# =============================================================================
+
+name: Terraform Apply
+
+on:
+  # Manual trigger with image tag override
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prd
+      image_tag:
+        description: 'Container image tag to deploy'
+        required: false
+        default: 'dev'
+        type: string
+
+  # Auto-trigger on version tags (deploys to dev then prd)
+  push:
+    tags:
+      - 'v*.*.*'
+    # Auto-trigger on infrastructure changes to main (deploys to dev only)
+    branches:
+      - main
+    paths:
+      - 'C4/infrastructure/**'
+      - '.github/workflows/terraform-*.yml'
+
+  # Auto-trigger after successful build (dev only)
+  workflow_run:
+    workflows: ["Build & Push App"]
+    types:
+      - completed
+    branches:
+      - main
+      - develop
+
+env:
+  TF_VERSION: '1.5.7'
+  WORKING_DIR: 'C4/infrastructure'
+  PROJECT_ID: 'fourth-outpost-479614-t4'
+  PROJECT_NUMBER: '319763204720'
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Apply Dev Environment
+  # ---------------------------------------------------------------------------
+  apply-dev:
+    name: Apply (Dev)
+    runs-on: ubuntu-latest
+    # Run on manual dispatch (dev), version tags, infra changes to main, or after successful build
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev') ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    environment: dev
+
+    permissions:
+      contents: read
+      id-token: write
+
+    outputs:
+      app_namespace: ${{ steps.outputs.outputs.app_namespace }}
+      app_service: ${{ steps.outputs.outputs.app_service }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'terraform-dev@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Determine Image Tag
+        id: image-tag
+        run: |
+          if [ -n "${{ inputs.image_tag }}" ]; then
+            echo "tag=${{ inputs.image_tag }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "workflow_run" ]; then
+            # Use the commit SHA from the triggering workflow
+            SHORT_SHA=$(echo "${{ github.event.workflow_run.head_sha }}" | cut -c1-7)
+            echo "tag=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            # For version tags, use the tag name without 'v' prefix
+            TAG_NAME="${GITHUB_REF#refs/tags/v}"
+            echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            # For push to main (infra changes), use commit SHA
+            SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+            echo "tag=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform Plan (Dev)
+        run: |
+          terraform plan \
+            -var-file=environments/dev/terraform.tfvars \
+            -var="app_image_tag=${{ steps.image-tag.outputs.tag }}" \
+            -var="grafana_admin_password=${{ secrets.GRAFANA_ADMIN_PASSWORD }}" \
+            -out=tfplan-dev
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform Apply (Dev)
+        run: terraform apply -auto-approve tfplan-dev
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Get Outputs
+        id: outputs
+        run: |
+          echo "app_namespace=$(terraform output -raw app_namespace)" >> $GITHUB_OUTPUT
+          echo "app_service=$(terraform output -raw app_service_name)" >> $GITHUB_OUTPUT
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Output Summary
+        run: |
+          echo "### Dev Environment Applied" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image Tag:** \`${{ steps.image-tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Application:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Namespace: \`$(terraform output -raw app_namespace)\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Service: \`$(terraform output -raw app_service_name)\`" >> $GITHUB_STEP_SUMMARY
+          echo "- HPA Enabled: \`$(terraform output -raw app_hpa_enabled)\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Port Forward Command:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          terraform output -raw app_port_forward_command >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: ${{ env.WORKING_DIR }}
+
+  # ---------------------------------------------------------------------------
+  # Apply Prd Environment (Manual only or after dev on tags)
+  # ---------------------------------------------------------------------------
+  apply-prd:
+    name: Apply (Prd)
+    runs-on: ubuntu-latest
+    # Run on manual dispatch (prd) or after dev succeeds on version tags
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'prd') ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+    environment: prd
+    needs: apply-dev
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'terraform-prd@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Determine Image Tag
+        id: image-tag
+        run: |
+          if [ -n "${{ inputs.image_tag }}" ]; then
+            echo "tag=${{ inputs.image_tag }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "push" ]; then
+            # For tags, use the tag name without 'v' prefix
+            TAG_NAME="${GITHUB_REF#refs/tags/v}"
+            echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=stable" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform Plan (Prd)
+        run: |
+          terraform plan \
+            -var-file=environments/prd/terraform.tfvars \
+            -var="app_image_tag=${{ steps.image-tag.outputs.tag }}" \
+            -var="grafana_admin_password=${{ secrets.GRAFANA_ADMIN_PASSWORD }}" \
+            -out=tfplan-prd
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform Apply (Prd)
+        run: terraform apply -auto-approve tfplan-prd
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Output Summary
+        run: |
+          echo "### Prd Environment Applied" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image Tag:** \`${{ steps.image-tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Application:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Namespace: \`$(terraform output -raw app_namespace)\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Service: \`$(terraform output -raw app_service_name)\`" >> $GITHUB_STEP_SUMMARY
+          echo "- HPA Enabled: \`$(terraform output -raw app_hpa_enabled)\`" >> $GITHUB_STEP_SUMMARY
+        working-directory: ${{ env.WORKING_DIR }}

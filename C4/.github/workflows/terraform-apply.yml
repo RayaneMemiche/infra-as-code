@@ -1,0 +1,102 @@
+# Terraform Apply Workflow
+# Applies infrastructure changes on version tags (v*.*.*)
+
+name: Terraform Apply
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+env:
+  TF_VERSION: '1.5.7'
+  WORKING_DIR: 'C4/infrastructure'
+  PROJECT_ID: 'fourth-outpost-479614-t4'
+
+jobs:
+  apply-dev:
+    name: Apply (Dev)
+    runs-on: ubuntu-latest
+    environment: dev
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'terraform-dev@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform Plan (Dev)
+        run: terraform plan -var-file=environments/dev/terraform.tfvars -out=tfplan-dev
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform Apply (Dev)
+        run: terraform apply -auto-approve tfplan-dev
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Output Summary
+        run: |
+          echo "### Dev Environment Applied ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          terraform output -no-color >> $GITHUB_STEP_SUMMARY
+        working-directory: ${{ env.WORKING_DIR }}
+
+  apply-prd:
+    name: Apply (Prd)
+    runs-on: ubuntu-latest
+    environment: prd
+    needs: apply-dev  # Apply prd only after dev succeeds
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'terraform-prd@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform Plan (Prd)
+        run: terraform plan -var-file=environments/prd/terraform.tfvars -out=tfplan-prd
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform Apply (Prd)
+        run: terraform apply -auto-approve tfplan-prd
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Output Summary
+        run: |
+          echo "### Prd Environment Applied ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          terraform output -no-color >> $GITHUB_STEP_SUMMARY
+        working-directory: ${{ env.WORKING_DIR }}

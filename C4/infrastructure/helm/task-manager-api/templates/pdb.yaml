@@ -1,0 +1,24 @@
+{{/*
+=============================================================================
+Task Manager API - Pod Disruption Budget
+C4 Project - High Availability Configuration
+=============================================================================
+*/}}
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "task-manager-api.fullname" . }}
+  labels:
+    {{- include "task-manager-api.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "task-manager-api.selectorLabels" . | nindent 6 }}
+{{- end }}

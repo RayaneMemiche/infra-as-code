@@ -1,0 +1,57 @@
+# =============================================================================
+# Docker Ignore - Task Manager API
+# Excludes files from Docker build context for faster builds and smaller images
+# =============================================================================
+
+# Dependencies (will be installed fresh in container)
+node_modules/
+npm-debug.log*
+
+# Environment files (secrets should come from K8s Secrets/ConfigMaps)
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation (not needed in production)
+*.md
+docs/
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+coverage/
+.nyc_output/
+
+# Build artifacts
+dist/
+build/
+
+# Docker files (don't include Dockerfile in context)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/

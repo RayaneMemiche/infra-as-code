@@ -7,7 +7,7 @@
 replicaCount: 2
 
 image:
-  repository: europe-west1-docker.pkg.dev/fourth-outpost-479614-t4/c4-images/task-manager-api
+  repository: europe-west1-docker.pkg.dev/iac-rattrapage-epitech/c4-images/task-manager-api
   pullPolicy: Always
   tag: "dev"
 
@@ -51,14 +51,14 @@ secrets:
 # Secrets are created by Terraform and synced via External Secrets Operator
 cloudSQL:
   enabled: true
-  projectId: "fourth-outpost-479614-t4"
+  projectId: "iac-rattrapage-epitech"
   secrets:
     databaseUrl: "c4-postgres-dev-db-url"
     databasePassword: "c4-postgres-dev-db-password"
 
 # Node selector for dev cluster
 nodeSelector:
-  cloud.google.com/gke-nodepool: application-pool
+  cloud.google.com/gke-nodepool: c4-cluster-dev-application
 
 # Ingress disabled in dev (use port-forward)
 ingress:

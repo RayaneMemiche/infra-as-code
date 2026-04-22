@@ -202,7 +202,7 @@ sequenceDiagram
     GH->>OIDC: 1. Request OIDC Token
     OIDC-->>GH: 2. JWT Token (repo, env, ref)
     GH->>WIF: 3. Exchange Token
-    Note over WIF: Validate:<br/>- repo = Jouzep/infra-as-code<br/>- environment = dev/prd
+    Note over WIF: Validate:<br/>- repo = RayaneMemiche/infra-as-code<br/>- environment = dev/prd
     WIF->>SA: 4. Impersonate SA
     SA-->>GH: 5. Temporary Credentials (1h)
     GH->>GCP: 6. API Calls with temp creds

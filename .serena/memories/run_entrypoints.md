@@ -17,7 +17,7 @@ terraform apply -var-file=environments/dev/terraform.tfvars
 ## Deploy Application (Helm)
 ```bash
 # 1) Ensure GKE credentials
-gcloud container clusters get-credentials c4-cluster-dev --region europe-west1 --project fourth-outpost-479614-t4
+gcloud container clusters get-credentials c4-cluster-dev --region europe-west1 --project iac-rattrapage-epitech
 
 # 2) Create/update secrets interactively
 ./C4/scripts/setup-secrets.sh

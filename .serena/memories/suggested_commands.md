@@ -12,7 +12,7 @@ brew install helm
 ```bash
 gcloud auth login
 gcloud auth application-default login
-gcloud config set project fourth-outpost-479614-t4
+gcloud config set project iac-rattrapage-epitech
 ```
 
 ## Terraform — Infrastructure Stack
@@ -44,9 +44,9 @@ terraform destroy -var-file=environments/dev/terraform.tfvars
 
 ## Verify Resources (gcloud)
 ```bash
-gcloud compute networks list --project=fourth-outpost-479614-t4
-gcloud compute networks subnets list --project=fourth-outpost-479614-t4
-gcloud compute firewall-rules list --project=fourth-outpost-479614-t4
+gcloud compute networks list --project=iac-rattrapage-epitech
+gcloud compute networks subnets list --project=iac-rattrapage-epitech
+gcloud compute firewall-rules list --project=iac-rattrapage-epitech
 gcloud compute routers nats list --router=c4-vpc-dev-router --region=europe-west1
 # WIF
 gcloud iam workload-identity-pools list --location=global

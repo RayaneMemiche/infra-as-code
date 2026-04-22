@@ -109,13 +109,13 @@ See [C4/README.md](C4/README.md) for full documentation and [C4/docs/DEFENSE_PLA
 ## 🌐 Deployed Infrastructure
 
 ### GCP Project
-- **Project ID**: `fourth-outpost-479614-t4`
+- **Project ID**: `iac-rattrapage-epitech`
 - **Region**: `europe-west1`
 
 ### Resources
 - **VPC Network**: `gcp-test` ✅ ACTIVE
 - **Subnet**: `gcp-test-subnet` (10.0.1.0/24) ✅ READY
-- **State Storage**: GCS Bucket `tfstate-fourth-outpost-479614-t4`
+- **State Storage**: GCS Bucket `tfstate-iac-rattrapage-epitech`
 
 ---
 
@@ -143,9 +143,9 @@ Status:       Ready
 
 ## 🔗 GCP Console Links
 
-- [VPC Networks](https://console.cloud.google.com/vpc/networks?project=fourth-outpost-479614-t4)
-- [VPC Network Details](https://console.cloud.google.com/vpc/networks/details/gcp-test?project=fourth-outpost-479614-t4)
-- [Subnet Details](https://console.cloud.google.com/vpc/networks/subnets/details/europe-west1/gcp-test-subnet?project=fourth-outpost-479614-t4)
+- [VPC Networks](https://console.cloud.google.com/vpc/networks?project=iac-rattrapage-epitech)
+- [VPC Network Details](https://console.cloud.google.com/vpc/networks/details/gcp-test?project=iac-rattrapage-epitech)
+- [Subnet Details](https://console.cloud.google.com/vpc/networks/subnets/details/europe-west1/gcp-test-subnet?project=iac-rattrapage-epitech)
 
 ---
 
@@ -299,13 +299,13 @@ terraform init -backend-config="./backends/dev.config"
 **Solution**: Verify GCP credentials
 ```bash
 gcloud auth list
-gcloud config set project fourth-outpost-479614-t4
+gcloud config set project iac-rattrapage-epitech
 ```
 
 ### Issue: Can't see state file in GCS
 **Solution**: List bucket contents
 ```bash
-gsutil ls gs://tfstate-fourth-outpost-479614-t4/terraform/state/
+gsutil ls gs://tfstate-iac-rattrapage-epitech/terraform/state/
 ```
 
 For more troubleshooting, see C2/README.md

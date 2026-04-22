@@ -15,7 +15,7 @@ terraform {
   }
 
   backend "gcs" {
-    bucket = "tfstate-fourth-outpost-479614-t4"
+    bucket = "tfstate-iac-rattrapage-epitech"
     prefix = "permissions/dev"  # Separate state from infrastructure
   }
 }

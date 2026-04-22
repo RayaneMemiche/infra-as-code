@@ -12,7 +12,7 @@ replicaCount: 1
 # IMAGE CONFIGURATION
 # -----------------------------------------------------------------------------
 image:
-  repository: europe-west1-docker.pkg.dev/fourth-outpost-479614-t4/c4-images/task-manager-api
+  repository: europe-west1-docker.pkg.dev/iac-rattrapage-epitech/c4-images/task-manager-api
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion
   tag: ""
@@ -31,7 +31,7 @@ serviceAccount:
   # IMPORTANT: This must match the GKE app service account created by Terraform
   # Get value from: terraform output gke_app_service_account_email
   annotations:
-    iam.gke.io/gcp-service-account: "taskmanager-app-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com"
+    iam.gke.io/gcp-service-account: "taskmanager-app-dev@iac-rattrapage-epitech.iam.gserviceaccount.com"
   # The name of the service account to use
   name: ""
 
@@ -191,7 +191,7 @@ cloudSQL:
   # Enable Cloud SQL connectivity (uses private IP from VPC)
   enabled: true
   # Project ID for Secret Manager
-  projectId: "fourth-outpost-479614-t4"
+  projectId: "iac-rattrapage-epitech"
   # GKE cluster info for Workload Identity
   # IMPORTANT: Must match Terraform output: terraform output gke_cluster_name
   clusterLocation: "europe-west1"

@@ -7,7 +7,7 @@
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
-  default     = "fourth-outpost-479614-t4"
+  default     = "iac-rattrapage-epitech"
 }
 
 variable "region" {

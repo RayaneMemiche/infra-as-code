@@ -64,7 +64,7 @@ C4/
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        GCP Project                               │
-│                 fourth-outpost-479614-t4                         │
+│                 iac-rattrapage-epitech                         │
 │                                                                  │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │                    VPC: c4-vpc-dev                         │  │
@@ -108,7 +108,7 @@ C4/
 │  └────────────────────────────┘  └────────────────────────────┘ │
 │               │                                                  │
 │               ▼                                                  │
-│        GitHub Actions (yorennz/infra-as-code)                   │
+│        GitHub Actions (RayaneMemiche/infra-as-code)                   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -135,7 +135,7 @@ brew install --cask google-cloud-sdk
 # Authentification
 gcloud auth login
 gcloud auth application-default login
-gcloud config set project fourth-outpost-479614-t4
+gcloud config set project iac-rattrapage-epitech
 ```
 
 ### 2. Stack Infrastructure
@@ -195,8 +195,7 @@ terraform apply -var-file=environments/dev/terraform.tfvars
 | Type | Nom | Email | Rôle |
 |------|-----|-------|------|
 | Prof | jjaouen | jeremie@jjaouen.com | viewer + billing |
-| Étudiant | lenny | lenny.vongphouthone@epitech.eu | editor |
-| Étudiant | yorenn | yorennzzelina@hotmail.fr | editor |
+| Étudiant | rayane | rayane.memiche@epitech.eu | editor |
 
 ### Ajouter un membre
 
@@ -228,7 +227,7 @@ terraform apply -var-file=environments/dev/terraform.tfvars
 #!/bin/bash
 # verify-all.sh - Vérifier toutes les ressources Terraform
 
-PROJECT_ID="fourth-outpost-479614-t4"
+PROJECT_ID="iac-rattrapage-epitech"
 REGION="europe-west1"
 ZONE="europe-west1-b"
 VPC_NAME="c4-vpc-dev"
@@ -378,66 +377,66 @@ echo "=============================================="
 
 ```bash
 # Workload Identity Pool
-gcloud iam workload-identity-pools list --location=global --project=fourth-outpost-479614-t4
+gcloud iam workload-identity-pools list --location=global --project=iac-rattrapage-epitech
 
 # Workload Identity Provider
 gcloud iam workload-identity-pools providers list \
   --workload-identity-pool=github-pool \
   --location=global \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Terraform Service Account
 gcloud iam service-accounts describe \
-  terraform-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+  terraform-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 
 # SA Roles
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
-  --filter="bindings.members:terraform-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com" \
+  --filter="bindings.members:terraform-dev@iac-rattrapage-epitech.iam.gserviceaccount.com" \
   --format="table(bindings.role)"
 
 # WIF Binding on SA
 gcloud iam service-accounts get-iam-policy \
-  terraform-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+  terraform-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 ```
 
 #### 2. Networking
 
 ```bash
 # VPC
-gcloud compute networks describe c4-vpc-dev --project=fourth-outpost-479614-t4
+gcloud compute networks describe c4-vpc-dev --project=iac-rattrapage-epitech
 
 # Subnet avec secondary ranges
 gcloud compute networks subnets describe c4-vpc-dev-subnet \
   --region=europe-west1 \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Cloud Router
 gcloud compute routers describe c4-vpc-dev-router \
   --region=europe-west1 \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Cloud NAT
 gcloud compute routers nats describe c4-vpc-dev-nat \
   --router=c4-vpc-dev-router \
   --region=europe-west1 \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Firewall Rules
 gcloud compute firewall-rules list \
   --filter="network:c4-vpc-dev" \
-  --project=fourth-outpost-479614-t4 \
+  --project=iac-rattrapage-epitech \
   --format="table(name,direction,priority,allowed[].map().firewall_rule().list():label=ALLOW)"
 
 # Private Service Connection
 gcloud compute addresses describe c4-vpc-dev-private-ip-range \
   --global \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # VPC Peering
 gcloud services vpc-peerings list \
   --network=c4-vpc-dev \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 ```
 
 #### 3. GKE
@@ -446,46 +445,46 @@ gcloud services vpc-peerings list \
 # Cluster
 gcloud container clusters describe c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Node Pools
 gcloud container node-pools list \
   --cluster=c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Node Pool details (taints, autoscaling)
 gcloud container node-pools describe c4-cluster-dev-runners \
   --cluster=c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4 \
+  --project=iac-rattrapage-epitech \
   --format="yaml(config.taints,autoscaling)"
 
 # GKE Service Accounts
 gcloud iam service-accounts list \
   --filter="email:taskmanager" \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # App SA Roles
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
-  --filter="bindings.members:taskmanager-app-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com" \
+  --filter="bindings.members:taskmanager-app-dev@iac-rattrapage-epitech.iam.gserviceaccount.com" \
   --format="table(bindings.role)"
 
 # Runners SA Roles
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
-  --filter="bindings.members:taskmanager-runners-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com" \
+  --filter="bindings.members:taskmanager-runners-dev@iac-rattrapage-epitech.iam.gserviceaccount.com" \
   --format="table(bindings.role)"
 
 # Workload Identity bindings
 gcloud iam service-accounts get-iam-policy \
-  taskmanager-app-dev@fourth-outpost-479614-t4.iam.gserviceaccount.com
+  taskmanager-app-dev@iac-rattrapage-epitech.iam.gserviceaccount.com
 
 # Get kubectl credentials
 gcloud container clusters get-credentials c4-cluster-dev \
   --zone=europe-west1-b \
-  --project=fourth-outpost-479614-t4
+  --project=iac-rattrapage-epitech
 
 # Kubectl commands (after credentials)
 kubectl get nodes -o wide
@@ -497,22 +496,22 @@ kubectl get namespaces
 
 ```bash
 # APIs activées
-gcloud services list --enabled --project=fourth-outpost-479614-t4
+gcloud services list --enabled --project=iac-rattrapage-epitech
 
 # Vérifier une API spécifique
-gcloud services list --enabled --filter="name:container.googleapis.com" --project=fourth-outpost-479614-t4
+gcloud services list --enabled --filter="name:container.googleapis.com" --project=iac-rattrapage-epitech
 ```
 
 #### 5. Permissions (Stack 2)
 
 ```bash
 # Tous les IAM bindings
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
   --format="table(bindings.role, bindings.members)"
 
 # Accès d'un membre spécifique
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
   --filter="bindings.members:jeremie@jjaouen.com" \
   --format="table(bindings.role)"
@@ -589,11 +588,11 @@ terraform init
 
 | Élément | Valeur |
 |---------|--------|
-| **Project ID** | `fourth-outpost-479614-t4` |
+| **Project ID** | `iac-rattrapage-epitech` |
 | **Region** | `europe-west1` |
 | **Zone** | `europe-west1-b` |
-| **State Bucket** | `tfstate-fourth-outpost-479614-t4` |
-| **GitHub Repo** | `yorennz/infra-as-code` |
+| **State Bucket** | `tfstate-iac-rattrapage-epitech` |
+| **GitHub Repo** | `RayaneMemiche/infra-as-code` |
 | **VPC Name** | `c4-vpc-dev` |
 | **Subnet CIDR** | `10.0.0.0/20` |
 | **Pods CIDR** | `10.1.0.0/16` |

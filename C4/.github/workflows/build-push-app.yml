@@ -35,7 +35,7 @@ on:
         type: string
 
 env:
-  PROJECT_ID: 'fourth-outpost-479614-t4'
+  PROJECT_ID: 'iac-rattrapage-epitech'
   REGION: 'europe-west1'
   REPOSITORY: 'c4-images'
   IMAGE_NAME: 'task-manager-api'

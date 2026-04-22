@@ -11,7 +11,7 @@ La **Permissions Stack** est une stack Terraform isolée qui gère exclusivement
 ```mermaid
 flowchart TB
     subgraph CONFIG["terraform.tfvars (Dev)"]
-        TFVARS["project_id = fourth-outpost-479614-t4<br/>region = europe-west1<br/>environment = dev"]
+        TFVARS["project_id = iac-rattrapage-epitech<br/>region = europe-west1<br/>environment = dev"]
     end
 
     subgraph VARS["variables.tf"]
@@ -34,7 +34,7 @@ flowchart TB
     end
 
     subgraph GCP["GCP IAM API"]
-        subgraph PROJ["Project: fourth-outpost-479614-t4"]
+        subgraph PROJ["Project: iac-rattrapage-epitech"]
             P1["user:jeremie@jjaouen.com → roles/viewer"]
             P2["user:lenny...@epitech.eu → roles/editor"]
             P3["user:yorennzzelina@... → roles/editor"]
@@ -96,7 +96,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    subgraph BUCKET["GCS Bucket: tfstate-fourth-outpost-479614-t4"]
+    subgraph BUCKET["GCS Bucket: tfstate-iac-rattrapage-epitech"]
         subgraph INFRA["infrastructure/dev/terraform.tfstate"]
             I1["VPC"]
             I2["Subnets"]
@@ -224,12 +224,12 @@ flowchart LR
 | Category | Key | Email | Role | Access Level |
 |----------|-----|-------|------|--------------|
 | **Professors** | jjaouen | jeremie@jjaouen.com | roles/viewer | Read-only project |
-| **Students** | lenny | lenny.vongphouthone@epitech.eu | roles/editor | Read + Write |
-| **Students** | yorenn | yorennzzelina@hotmail.fr | roles/editor | Read + Write |
+| **Students** | lenny | rayane.memiche@epitech.eu | roles/editor | Read + Write |
+| **Students** | yorenn | rayane.memiche@epitech.eu | roles/editor | Read + Write |
 | **Service Accounts** | (none) | - | - | - |
 | **Billing Viewers** | - | jeremie@jjaouen.com | billing.viewer | View costs only |
 
-**Project**: `fourth-outpost-479614-t4`
+**Project**: `iac-rattrapage-epitech`
 **Region**: `europe-west1`
 **Environment**: `dev`
 
@@ -344,7 +344,7 @@ terraform state list
 terraform output
 
 # Verify in GCP
-gcloud projects get-iam-policy fourth-outpost-479614-t4 \
+gcloud projects get-iam-policy iac-rattrapage-epitech \
   --flatten="bindings[].members" \
   --format="table(bindings.role, bindings.members)"
 ```

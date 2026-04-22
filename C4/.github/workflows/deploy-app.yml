@@ -32,13 +32,13 @@ on:
       - develop
 
 env:
-  PROJECT_ID: 'fourth-outpost-479614-t4'
+  PROJECT_ID: 'iac-rattrapage-epitech'
   REGION: 'europe-west1'
   CLUSTER_NAME: 'c4-cluster-dev'
   NAMESPACE: 'task-manager'
   RELEASE_NAME: 'task-manager-api'
   CHART_PATH: 'C4/infrastructure/helm/task-manager-api'
-  IMAGE_REPO: 'europe-west1-docker.pkg.dev/fourth-outpost-479614-t4/c4-images/task-manager-api'
+  IMAGE_REPO: 'europe-west1-docker.pkg.dev/iac-rattrapage-epitech/c4-images/task-manager-api'
 
 jobs:
   # ---------------------------------------------------------------------------

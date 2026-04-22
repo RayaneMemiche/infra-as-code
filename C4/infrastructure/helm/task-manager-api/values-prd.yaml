@@ -7,7 +7,7 @@
 replicaCount: 3
 
 image:
-  repository: europe-west1-docker.pkg.dev/fourth-outpost-479614-t4/c4-images/task-manager-api
+  repository: europe-west1-docker.pkg.dev/iac-rattrapage-epitech/c4-images/task-manager-api
   pullPolicy: IfNotPresent
   tag: "stable"
 

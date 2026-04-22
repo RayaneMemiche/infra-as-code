@@ -58,7 +58,7 @@ cloudSQL:
 
 # Node selector for dev cluster
 nodeSelector:
-  cloud.google.com/gke-nodepool: application-pool
+  cloud.google.com/gke-nodepool: c4-cluster-dev-application
 
 # Ingress disabled in dev (use port-forward)
 ingress:

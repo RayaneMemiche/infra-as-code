@@ -1,0 +1,59 @@
+# Test Workload Identity Federation
+# Manual workflow to test if WIF is configured correctly
+
+name: Test WIF Authentication
+
+on:
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: 'fourth-outpost-479614-t4'
+
+jobs:
+  test-auth:
+    name: Test GCP Authentication
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write  # Required for WIF
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (WIF)
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'terraform-dev@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Verify Authentication
+        run: |
+          echo "### WIF Authentication Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "**Authenticated Account:**" >> $GITHUB_STEP_SUMMARY
+          gcloud auth list --filter=status:ACTIVE --format="value(account)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "**Project:**" >> $GITHUB_STEP_SUMMARY
+          gcloud config get-value project >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "**Access Token (first 20 chars):**" >> $GITHUB_STEP_SUMMARY
+          gcloud auth print-access-token | cut -c1-20 >> $GITHUB_STEP_SUMMARY
+          echo "..." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "✅ **WIF Authentication Successful!**" >> $GITHUB_STEP_SUMMARY
+
+      - name: Test GCP Access
+        run: |
+          echo "Testing GCP API access..."
+          gcloud projects describe ${{ env.PROJECT_ID }} --format="value(projectNumber)"
+          echo "✅ Successfully accessed GCP project"

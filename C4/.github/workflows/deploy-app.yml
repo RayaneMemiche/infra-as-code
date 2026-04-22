@@ -1,0 +1,273 @@
+# =============================================================================
+# Deploy Task Manager API to GKE
+# Uses Helm for deployment with Workload Identity Federation
+# =============================================================================
+
+name: Deploy App to GKE
+
+on:
+  # Manual deployment with environment selection
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prd
+      image_tag:
+        description: 'Image tag to deploy (default: latest build)'
+        required: false
+        type: string
+
+  # Auto-deploy after successful build (dev only)
+  workflow_run:
+    workflows: ["Build & Push App"]
+    types:
+      - completed
+    branches:
+      - main
+      - develop
+
+env:
+  PROJECT_ID: 'fourth-outpost-479614-t4'
+  REGION: 'europe-west1'
+  CLUSTER_NAME: 'c4-cluster-dev'
+  NAMESPACE: 'task-manager'
+  RELEASE_NAME: 'task-manager-api'
+  CHART_PATH: 'C4/infrastructure/helm/task-manager-api'
+  IMAGE_REPO: 'europe-west1-docker.pkg.dev/fourth-outpost-479614-t4/c4-images/task-manager-api'
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Deploy to Development
+  # ---------------------------------------------------------------------------
+  deploy-dev:
+    name: Deploy to Dev
+    runs-on: ubuntu-latest
+    # Run on manual dispatch (dev) or after successful build
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    environment: dev
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (WIF)
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'terraform-dev@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Get GKE Credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.CLUSTER_NAME }}
+          location: ${{ env.REGION }}
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.13.0'
+
+      - name: Determine Image Tag
+        id: image-tag
+        run: |
+          if [ -n "${{ inputs.image_tag }}" ]; then
+            echo "tag=${{ inputs.image_tag }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "workflow_run" ]; then
+            # Use the commit SHA from the triggering workflow
+            echo "tag=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+          else
+            # Default to 'dev' tag
+            echo "tag=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if Secret Exists
+        id: check-secret
+        run: |
+          if kubectl get secret task-manager-api-secrets -n ${{ env.NAMESPACE }} 2>/dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "::warning::Secret 'task-manager-api-secrets' not found in namespace '${{ env.NAMESPACE }}'"
+            echo "::warning::Please create it before deployment. See scripts/setup-secrets.sh"
+          fi
+
+      - name: Create Namespace if Not Exists
+        run: |
+          kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install ${{ env.RELEASE_NAME }} ./${{ env.CHART_PATH }} \
+            --namespace ${{ env.NAMESPACE }} \
+            --values ./${{ env.CHART_PATH }}/values-dev.yaml \
+            --set image.tag=${{ steps.image-tag.outputs.tag }} \
+            --wait \
+            --timeout 5m \
+            --atomic
+
+      - name: Wait for Rollout
+        run: |
+          kubectl rollout status deployment/${{ env.RELEASE_NAME }} \
+            --namespace ${{ env.NAMESPACE }} \
+            --timeout=300s
+
+      - name: Verify Deployment
+        run: |
+          echo "### Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Get pod status
+          echo "**Pods:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl get pods -n ${{ env.NAMESPACE }} -l app.kubernetes.io/name=task-manager-api >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          # Get service
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Service:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl get svc -n ${{ env.NAMESPACE }} >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          # Get HPA
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**HPA:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl get hpa -n ${{ env.NAMESPACE }} >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Smoke Test (Port Forward)
+        if: steps.check-secret.outputs.exists == 'true'
+        run: |
+          # Start port-forward in background
+          kubectl port-forward svc/${{ env.RELEASE_NAME }} 8080:80 -n ${{ env.NAMESPACE }} &
+          PF_PID=$!
+          sleep 10
+
+          # Test health endpoint
+          echo "Testing /health endpoint..."
+          HEALTH_RESPONSE=$(curl -sf http://localhost:8080/health || echo "FAILED")
+          echo "Health response: $HEALTH_RESPONSE"
+
+          # Test ready endpoint
+          echo "Testing /ready endpoint..."
+          READY_RESPONSE=$(curl -sf http://localhost:8080/ready || echo "FAILED")
+          echo "Ready response: $READY_RESPONSE"
+
+          # Cleanup
+          kill $PF_PID 2>/dev/null || true
+
+          # Report
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Smoke Tests:**" >> $GITHUB_STEP_SUMMARY
+          echo "- /health: $HEALTH_RESPONSE" >> $GITHUB_STEP_SUMMARY
+          echo "- /ready: $READY_RESPONSE" >> $GITHUB_STEP_SUMMARY
+
+      - name: Output Access Instructions
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Access Instructions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To access the API locally:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "kubectl port-forward svc/${{ env.RELEASE_NAME }} 8080:80 -n ${{ env.NAMESPACE }}" >> $GITHUB_STEP_SUMMARY
+          echo "curl http://localhost:8080/health" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  # ---------------------------------------------------------------------------
+  # Deploy to Production (Manual Only)
+  # ---------------------------------------------------------------------------
+  deploy-prd:
+    name: Deploy to Prd
+    runs-on: ubuntu-latest
+    # Only on manual dispatch with prd environment
+    if: github.event_name == 'workflow_dispatch' && inputs.environment == 'prd'
+    environment: prd
+    # Require dev deployment first for workflow_run
+    # needs: deploy-dev
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (WIF)
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'terraform-prd@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Get GKE Credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          # Production would use a different cluster
+          cluster_name: 'c4-cluster-prd'
+          location: ${{ env.REGION }}
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.13.0'
+
+      - name: Determine Image Tag
+        id: image-tag
+        run: |
+          if [ -n "${{ inputs.image_tag }}" ]; then
+            echo "tag=${{ inputs.image_tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=stable" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Namespace if Not Exists
+        run: |
+          kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install ${{ env.RELEASE_NAME }} ./${{ env.CHART_PATH }} \
+            --namespace ${{ env.NAMESPACE }} \
+            --values ./${{ env.CHART_PATH }}/values-prd.yaml \
+            --set image.tag=${{ steps.image-tag.outputs.tag }} \
+            --wait \
+            --timeout 5m \
+            --atomic
+
+      - name: Wait for Rollout
+        run: |
+          kubectl rollout status deployment/${{ env.RELEASE_NAME }} \
+            --namespace ${{ env.NAMESPACE }} \
+            --timeout=300s
+
+      - name: Verify Deployment
+        run: |
+          echo "### Production Deployment Status ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          kubectl get pods,svc,hpa -n ${{ env.NAMESPACE }} >> $GITHUB_STEP_SUMMARY

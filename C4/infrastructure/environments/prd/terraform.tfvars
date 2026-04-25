@@ -15,13 +15,13 @@ services_cidr = "10.12.0.0/20"
 # GKE Cluster
 gke_cluster_name      = "c4-cluster-prd"
 gke_node_machine_type = "e2-medium"
-gke_min_nodes         = 2
-gke_max_nodes         = 5
-gke_initial_nodes     = 2
+gke_min_nodes         = 1
+gke_max_nodes         = 3
+gke_initial_nodes     = 1
 
 # Database
 db_instance_name = "c4-postgres-prd"
-db_tier          = "db-g1-small"
+db_tier          = "db-f1-micro"
 db_name          = "taskmanager"
 db_user          = "taskmanager"
 

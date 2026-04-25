@@ -130,8 +130,8 @@ jobs:
       - name: Get Outputs
         id: outputs
         run: |
-          echo "app_namespace=$(terraform output -raw app_namespace)" >> $GITHUB_OUTPUT
-          echo "app_service=$(terraform output -raw app_service_name)" >> $GITHUB_OUTPUT
+          echo "cluster_name=$(terraform output -raw gke_cluster_name)" >> $GITHUB_OUTPUT
+          echo "grafana_service=$(terraform output -raw grafana_service)" >> $GITHUB_OUTPUT
         working-directory: ${{ env.WORKING_DIR }}
 
       - name: Output Summary
@@ -140,14 +140,14 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Image Tag:** \`${{ steps.image-tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Application:**" >> $GITHUB_STEP_SUMMARY
-          echo "- Namespace: \`$(terraform output -raw app_namespace)\`" >> $GITHUB_STEP_SUMMARY
-          echo "- Service: \`$(terraform output -raw app_service_name)\`" >> $GITHUB_STEP_SUMMARY
-          echo "- HPA Enabled: \`$(terraform output -raw app_hpa_enabled)\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Infrastructure:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Cluster: \`$(terraform output -raw gke_cluster_name)\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Database: \`$(terraform output -raw database_instance_name)\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Registry: \`$(terraform output -raw artifact_registry_url)\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Port Forward Command:**" >> $GITHUB_STEP_SUMMARY
+          echo "**Kubectl Config:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          terraform output -raw app_port_forward_command >> $GITHUB_STEP_SUMMARY
+          terraform output -raw kubectl_config_command >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
         working-directory: ${{ env.WORKING_DIR }}
 
